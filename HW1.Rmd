@@ -1,0 +1,184 @@
+---
+title: "hw1sidefile"
+output: html_document
+author: "Erick Jun"
+date: "2025-02-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Importing Data
+dataframe = read.csv(Users/erickjun/Downloads/Typical_Employee_Survey_Data.csv
+View(dataframe)
+
+
+# Assigning Header Names
+colnames(dataframe) <-c("Age", "Gender", "Satisfaction", "Important Job Characteristics", "Years Under Employer", "Promotion Likelihood", "Decision Making", "Budgetary Decision Making", "Pride in Employer", "Job Offers Outlook", "Description of Workplace Relationship")
+
+# 5 Number Summary
+summary(dataframe[,c("Age", "Gender", "Satisfaction", "Important Job Characteristics", "Years Under Employer", "Promotion Likelihood", "Decision Making", "Budgetary Decision Making", "Pride in Employer", "Job Offers Outlook", "Description of Workplace Relationship")])
+
+# Boxplot for Each Column
+boxplot(Typical_Employee_Survey_Data[, c("Age", "Gender", "Job", "Important Job Characteristics", "Years Under Employer", "Promotion Likelihood", "Decision Making", "Budgetary Decision Making", "Pride in Employer", "Job Offers Outlook", "Description of Workplace Relationship")],
++         main = "Boxplot of Employer Survey",
++         col= rainbow(11),
++         ylab = "Values")
+
+# Factoring
+dataframe$Gender <- factor(dataframe$Gender, 
+                           levels = c(1, 2), 
+                           labels = c("Male", "Female"))
+
+dataframe$Satisfaction <- factor(dataframe$Satisfaction, 
+                                    levels = c(1, 2, 3, 4), 
+                                    labels = c("Very Dissatisfied", "A Little                                                      Dissatisfied", 
+                                               "Moderately Satisfied", "Very                                                       Satisfied"),
+                                    ordered = TRUE) 
+                                    
+dataframe$`Important Job Characteristics` <- factor(dataframe$`Important Job Characteristics`, 
+                                                    levels = c(1, 2, 3, 4, 5), 
+                                                    labels = c("High Income", "No Danger of Being Fired", 
+                                                               "Flexible Hours", "Opportunities for Advancement", 
+                                                               "Enjoying the Work"),
+                                                    ordered = TRUE) 
+
+dataframe$`Promotion Likelihood` <- factor(dataframe$`Promotion Likelihood`, 
+                                           levels = c(1, 2, 3, 4, 5), 
+                                           labels = c("Very Likely", "Likely", "Not Sure", 
+                                                      "Unlikely", "Very Unlikely"),
+                                           ordered = TRUE)
+
+dataframe$`Decision Making` <- factor(dataframe$`Decision Making`, 
+                                      levels = c(1, 2, 3, 4), 
+                                      labels = c("Always", "Much of the Time", 
+                                                 "Sometimes", "Never"),
+                                      ordered = TRUE) 
+                                      
+
+
+
+dataframe$`Budgetary Decision Making` <- factor(dataframe$`Budgetary Decision Making`, 
+                                                levels = c(1, 2), 
+                                                labels = c("Yes", "No")) 
+                                                
+dataframe$`Pride in Employer` <- factor(dataframe$`Pride in Employer`, 
+                                        levels = c(1, 2, 3, 4), 
+                                        labels = c("Very Proud", "Somewhat Proud", 
+                                                   "Indifferent", "Not At All Proud"),
+                                        ordered = TRUE)                            
+                                        
+dataframe$`Job Offers Outlook` <- factor(dataframe$`Job Offers Outlook`, 
+                                       levels = c(1, 2, 3, 4, 5), 
+                                       labels = c("Very Likely", "Likely", "Not Sure", 
+                                                  "Unlikely", "Very Unlikely"),
+                                       ordered = TRUE)                             
+                                       
+dataframe$`Description of Workplace Relationship` <- factor(dataframe$`Description of Workplace Relationship`, 
+                                                            levels = c(1, 2, 3, 4, 5), 
+                                                            labels = c("Very Good", "Good", "So-So", "Bad", "Very Bad"),
+                                                            ordered = TRUE)       
+# Age Boxplot                                                            
+#I chose boxplot for age because it highlights the distribution of age with the visual of the 5 number summary
+
+boxplot(dataframe$Age, 
+        main = "Boxplot of Age", 
+        ylab = "Age", 
+        col = "lightblue", 
+        border = "black") 
+        
+        
+# Gender Barplot       
+#I chose a barplot for gender because it is a categorical attribute and the barplot shows proportion well
+
+barplot(table(dataframe$Gender), 
+        main = "Gender Distribution", 
+        col = c("blue", "pink"), 
+        ylab = "Count")
+
+# Satisfaction Barplot        
+#I chose barplot because it shows the distribution and proportion of satisfaction levels throughout the workplace well 
+
+barplot(table(dataframe$Satisfaction), 
+        main = "Job Satisfaction Levels", 
+        col = "purple", 
+        ylab = "Count", 
+        xlab = "Satisfaction Level")       
+
+# Job Characteristics Barplot
+#shows proportion well 
+
+barplot(table(dataframe$`Important Job Characteristics`), 
+        main = "Most Important Job Characteristics", 
+        col = "green", 
+        ylab = "Count")
+
+# Years Under Employer Histogram
+#I chose a histogram because it it highlights every input for years worked under employer
+
+hist(dataframe$`Years Under Employer`, 
+     main = "Years Under Employer Distribution", 
+     xlab = "Years", 
+     col = "orange", 
+     border = "black")
+
+# Promotion Barplot
+#shows proportion well and is ordinal
+
+barplot(table(dataframe$`Promotion Likelihood`), 
+        main = "Promotion Likelihood", 
+        col = "cyan", 
+        ylab = "Count")
+
+# Decision Making Barplot       
+#Shows distribution well
+
+barplot(table(dataframe$`Decision Making`), 
+        main = "Employee Decision Making Involvement", 
+        col = "red", 
+        ylab = "Count")  
+
+# Budgetary Decision Barplot        
+#Shows proportion well
+
+barplot(table(dataframe$`Budgetary Decision`), 
+        main = "Participation in Budgetary Decisions", 
+        col = c("blue", "red"), 
+        ylab = "Count")        
+
+# Pride in Emplyer Barplot
+#Shows the disribution of answers well
+
+barplot(table(dataframe$`Pride in Employer`), 
+        main = "Pride in Employer", 
+        col = "purple", 
+        ylab = "Count")    
+ 
+# Job Offers Barplot        
+#Shows the distribution of answers well 
+
+barplot(table(dataframe$`Job Offers Outlook`), 
+        main = "Job Offers Outlook", 
+        col = "green", 
+        ylab = "Count")
+
+# Relationship Barplot
+#Shows the distribution of answers well 
+
+barplot(table(dataframe$`Description of Workplace Relationship`), 
+        main = "Workplace Relationships", 
+        col = "brown", 
+        ylab = "Count")   
+
+# Relationship between Years Worked and Job Satisfaction
+#I chose to compare the years worked under the employer and job satisfaction because I thought it makes an interesting yet real and useful correlation between the two variables         
+plot(dataframe$`Years Under Employer`, dataframe$Satisfaction, 
+     main = "Scatter Plot of Years Under Employer vs. Job Satisfaction",
+     xlab = "Years Under Employer", 
+     ylab = "Job Satisfaction Level", 
+     col = "blue", 
+     pch = 16)
+     
+     
+     
