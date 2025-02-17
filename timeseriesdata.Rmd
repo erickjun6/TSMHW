@@ -1,0 +1,32 @@
+---
+title: "Time Series Data"
+author: "Erick Jun"
+date: "2025-02-17"
+output: html_document
+---
+
+```{r}
+
+Varable Names: 
+  Model (int)
+  Jan (int)
+  Feb (int)
+  March (int)
+  April (int)
+  May (int)
+  June (int)
+  July (int)
+  Aug (int)
+  Sep (int)
+  Oct (int)
+  Nov (int)
+  Dec (int) 
+  Sum of Sales 
+  Year
+  Category - Car type 
+
+This data is sourced from goodcarbadcar, the leader in automotive sales data. This data covers 3 years (2019-2021), and is on a monthly time span 
+
+This dataset intrigues me because I currently work as a part time retail worker for Nike and I would like to get into a corporate analyst role. So I believe this will be a good dataset for e to learn on and make my way into a corporate role as an analyst 
+```
+
