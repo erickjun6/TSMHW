@@ -1,0 +1,90 @@
+---
+title: "HW4"
+author: "Erick Jun"
+date: "2025-02-27"
+output: html_document
+---
+
+
+```{r}
+
+df <- read.csv("/Users/erickjun/Downloads/Canadasalesdata.csv")
+
+# Plotting the Time Series 
+library(tidyr) 
+library(dplyr)
+library(ggplot2)
+library(forecast)
+#### I imported tidyr to manipulate and reshape the dataset
+#### I imported ddplyr to manipulate and filter data 
+#### I imported ggplot2 for data visualization and plotting
+#### I imported forcecast for certain analysis tools and packages
+
+
+df_long <- df %>% 
+  pivot_longer(cols = Jan:Dec, names_to = "Month", values_to = "Sales") %>%
+  select(Year, Month, Sales)
+#### Reshaping the data to have the months in rows
+
+
+df_long$Month <- factor(df_long$Month, 
+                        levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+                        ordered = TRUE)
+#### Factor converts the months into categorical variables and I am checking to make sure the months are in the proper order 
+
+
+monthly_totals <- df_long %>%
+  group_by(Year, Month) %>%
+  summarise(Total_Sales = sum(Sales, na.rm = TRUE)) %>%
+  ungroup()
+#### Here I am totaling the sales across all car models to get our monthly totals 
+
+
+monthly_totals$Month <- match(monthly_totals$Month, month.abb)
+#### Converting the months to numeric values 
+
+
+monthly_totals <- monthly_totals %>%
+  arrange(Year, Month)
+#### Ordering the months and years from Jan 2019 - Jan 2021 
+
+
+ts_data <- ts(monthly_totals$Total_Sales, start = c(min(monthly_totals$Year), 1), frequency = 12)
+#### Converting the monthly total sale fro 2019-2021 into a time series 
+
+  
+ggplot(monthly_totals, aes(x = Month, y = Total_Sales, group = Year, color = as.factor(Year))) +
+  geom_line(size = 1) + 
+  geom_point(size = 2) +
+  labs(title = "Monthly Car Sales (2019-2021)", x = "Month", y = "Total Sales", color = "Year") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#### Using ggplot2 to plot the time series of monthly sales 
+#### The plot output shows the monthly sales from 2019-2021
+#### The lines given for the years 2019-2021 show some level of seasonality
+
+
+Acf(ts_data, main = "Autocorrelation Function (ACF) of Monthly Sales")
+#### Using the ACF function from the forecast package 
+#### The ACF plot shows us that in January 2019, there is very high positive correlation, while around the same time next year, there is a slight negative correlation, and then again at month 24, showing seasonality
+
+decomp <- decompose(ts_data, type = "additive")
+plot(decomp)
+#### Using the decomp function from the forecast package
+#### From the decomp chart, I can see seasonality, which is consistant with the other two plots, as well as high levels of noise (random) which makes sense because the last few months of thw 2021 year have no sales data as well as months in the year with very low sales (single digits) 
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
