@@ -1,0 +1,134 @@
+---
+title: "Practice Exam"
+author: "Erick Jun"
+date: "2025-03-04"
+output: html_document
+---
+
+```{r}
+
+library(fpp2)
+library(ggplot2)
+library(forecast)
+library(tseries)
+library(TTR)
+library(gridExtra)
+
+data("arrivals")
+arrivals_ts <- arrivals[, "US"]
+
+autoplot(arrivals_ts) + 
+  ggtitle("US Arrivals to Australia") + 
+  ylab("Number of Arrivals") + 
+  xlab("Year")
+
+# The upward trend indicates a rising number of travelers from the US in Australia 
+# There also seem to be a seasonal upspike every ten years 
+
+
+summary(arrivals_ts)
+boxplot(arrivals_ts, main="Boxplot of US Arrivals", ylab="Number of Arrivals")
+
+# The summary statistics shwo that the mean and meduan are quite close which shows its symmetry
+# The boxplot also shows that there are some outliers which skew the data slightly 
+# Obataining the IQR (Q3 - Q1), we see some variation of the US arrivals in Australia 
+
+
+
+decomp <- decompose(arrivals_ts, type = "multiplicative")
+autoplot(decomp) +
+  ggtitle("Multiplicative Decomposition of US Arrivals") +
+  theme_minimal()
+
+# There is a general upward trend 
+# The seasonality section shows repeating cycles 
+# The irregular chart shows some variation in US arrivalsl 
+
+seasonal_values <- decomp$seasonal
+seasonal_values[1:12]  # Display first 12 months of seasonal indices
+
+# Yes, the data is seasonal, multiplicative
+
+highest_month <- which.max(seasonal_values[1:12])
+lowest_month <- which.min(seasonal_values[1:12])
+
+cat("Highest seasonal value occurs in month:", highest_month, "\n")
+cat("Lowest seasonal value occurs in month:", lowest_month, "\n")
+
+# High months may correspond with holidays seasons 
+# Low months may correspond with slow periods in travel, like before the holidays 
+
+us_adjusted <- arrivals_ts / decomp$seasonal
+
+
+autoplot(arrivals_ts, series = "Actual") +
+  autolayer(us_adjusted, series = "Seasonally Adjusted", color = "red") +
+  ggtitle("Seasonally Adjusted vs Actual US Arrivals") +
+  xlab("Year") + ylab("Number of Arrivals") +
+  theme_minimal() +
+  guides(color = guide_legend(title = "Series"))
+
+
+
+naive_forecast <- naive(arrivals_ts, h=12) # Forecast for next 12 months
+
+autoplot(naive_forecast) +
+  ggtitle("Naïve Forecast of US Arrivals to Australia") +
+  xlab("Year") + ylab("Number of Arrivals") +
+  theme_minimal()
+
+residuals_naive <- residuals(naive_forecast)
+
+autoplot(residuals_naive) +
+  ggtitle("Residuals from Naïve Forecasting") +
+  xlab("Year") + ylab("Residuals") +
+  theme_minimal()
+
+# The plotted residuals show some patterning, meaning it may not be the best model 
+
+
+ggplot(data = data.frame(residuals_naive), aes(x = residuals_naive)) +
+  geom_histogram(fill = "lightblue", color = "black", bins = 30) +
+  ggtitle("Histogram of Residuals (Naïve Forecast)") +
+  xlab("Residual Value") + ylab("Frequency") +
+  theme_minimal()
+
+# The histogram shows normal distribution 
+
+
+ggplot(data = data.frame(Fitted = fitted(naive_forecast), Residuals = residuals_naive), aes(x = Fitted, y = Residuals)) +
+  geom_point(color = "blue") +
+  ggtitle("Fitted Values vs. Residuals") +
+  xlab("Fitted Values") + ylab("Residuals") +
+  theme_minimal()
+
+# There is no clear visual pattern
+
+
+ggplot(data = data.frame(Actual = arrivals_ts, Residuals = residuals_naive), aes(x = Actual, y = Residuals)) +
+  geom_point(color = "red") +
+  ggtitle("Actual Values vs. Residuals") +
+  xlab("Actual Values") + ylab("Residuals") +
+  theme_minimal()
+
+# This plot also shows no visual pattern 
+
+Acf(residuals_naive, main="ACF of Residuals (Naïve Forecast)")
+
+accuracy(naive_forecast)
+
+forecast_next_year <- forecast(naive_forecast, h=12)
+forecast_next_year
+
+
+autoplot(arrivals_ts, series = "Actual") +
+  autolayer(forecast_next_year$mean, series = "Naïve Forecast", color = "red") +
+  ggtitle("Naïve Forecast vs. Actual US Arrivals") +
+  xlab("Year") + ylab("Number of Arrivals") +
+  theme_minimal() +
+  guides(color = guide_legend(title = "Series"))
+```
+
+
+
+
