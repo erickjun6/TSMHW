@@ -1,0 +1,82 @@
+---
+title: "ARIMA"
+author: "Erick Jun"
+date: "2025-04-05"
+output: html_document
+---
+
+```{r}
+# ARIMA 
+
+library(forecast)    
+library(tseries)   
+library(tidyr) 
+library(dplyr)
+library(ggplot2)
+library(forecast)
+
+df <- read.csv("/Users/erickjun/Downloads/Canadasalesdata.csv")
+
+# Reshaping the Data 
+
+df_long <- df %>% 
+  pivot_longer(
+    cols = Jan:Dec,
+    names_to = "Month",
+    values_to = "Sales"
+  ) %>%
+  select(Year, Month, Sales)
+
+df_long <- df_long %>%
+  mutate(Sales = as.numeric(Sales))
+
+df_long$Month <- factor(df_long$Month,
+                        levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+                        ordered = TRUE)
+
+monthly_totals <- df_long %>%
+  group_by(Year, Month) %>%
+  summarise(Total_Sales = sum(Sales, na.rm = TRUE)) %>%
+  ungroup() %>%
+  arrange(Year, Month)
+
+monthly_totals$Month_Num <- match(monthly_totals$Month, month.abb)
+
+# Converting to a time series 
+
+ts_data <- ts(monthly_totals$Total_Sales, 
+              start = c(min(monthly_totals$Year), 1), 
+              frequency = 12)
+
+# Arima Model
+
+arima_model <- auto.arima(ts_data, seasonal = TRUE)
+summary(arima_model)
+autoplot(arima_model)
+ #1. The ARIMA plot shows no root, which means that my model does not incorporate any AR (auto-regressive) or MA (moving averages) hence the (0,1,0). This (0,1,0) represents a "random walk" type of model, which doesnt capture the trends or seasonality of the data because it may not have any 
+
+# Residual Analysis 
+
+checkresiduals(arima_model)
+
+# Forecasting the next five months 
+
+forecast_vals <- forecast(arima_model, h = 5)
+
+autoplot(forecast_vals) +
+  ggtitle("5-Month Ahead Forecast") +
+  ylab("Total Sales")
+
+# Model Accuracy
+
+train <- window(ts_data, end = c(2020, 12))
+test <- window(ts_data, start = c(2021, 1))
+
+model_train <- auto.arima(train)
+
+fcast <- forecast(model_train, h = length(test))
+
+accuracy(fcast, test)
+
+
